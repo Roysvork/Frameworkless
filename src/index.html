@@ -14,8 +14,8 @@
 					name: "pete"
 				}
 
-				dataBinding.value(viewModel, "name", "#name")
-				viewModel.name = "Peter"
+				dataBinding.to.text(viewModel, "name", "#greeting")
+				dataBinding.from.value(viewModel, "name", "#name")
 			})
 		</script>
 	</body>
