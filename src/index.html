@@ -10,7 +10,12 @@
 		<script type="text/javascript" src="lib/data-binding.js"></script>
 		<script type="text/javascript">
 			ready(function() {
-				alert('hello, world!');
+				var viewModel = {
+					name: "pete"
+				}
+
+				dataBinding.value(viewModel, "name", "#name")
+				viewModel.name = "Peter"
 			})
 		</script>
 	</body>
