@@ -1,30 +1,83 @@
 (function (dataBinding) {
 
-	var toText = function (model, propertyName, selector) {
-		var element = document.querySelectorAll(selector)[0];
-		var value = model[propertyName];
+	var wrap = function(fn, model) {
+		var actions = [];
+		var update = function() { 
+			var result = fn.bind(model)();
+			forEach(actions, function (action) {				
+				action(result);
+			});
+		}
 
-		Object.defineProperty(model, propertyName, {
-			get: function() { return value },
-			set: function(newValue) { element.textContent = newValue }
+		fn.wrapped = true;
+		fn.actions = actions;
+		fn.update = update;
+
+		return fn;
+	}
+
+	var ensureWrapped = function (model, propertyName) {
+		var prop = model[propertyName];
+		if (typeof prop == "function") {
+			return (prop.wrapped) ? prop : wrap(prop, model);
+		}
+		else
+		{				
+			var getter = model.__lookupGetter__(propertyName);
+			if (getter && getter.wrapped) {
+				return getter;
+			}
+
+			getter = wrap(function() { return prop }, model);
+			Object.defineProperty(model, propertyName, {
+				get: getter,
+				set: function(newValue) { 
+					prop = newValue; 
+					getter.update();
+				}
+			});
+
+			return getter;
+		}
+	}
+
+	var addDependency = function (model, propertyName, dependencyName) {
+		var computed = ensureWrapped(model, propertyName);
+		var wrapper = ensureWrapped(model, dependencyName);
+		wrapper.actions.push(function (newValue) {
+			computed.update(model);
 		});
 
-		model[propertyName] = value;
+		wrapper.update(model);
+	}
+
+	var toText = function (model, propertyName, selector) {
+		var element = document.querySelectorAll(selector)[0];
+		var wrapper = ensureWrapped(model, propertyName);
+
+		wrapper.actions.push(function (value) {
+			element.textContent = value;
+		});
+
+		wrapper.update(model);
+	}
+
+	var fromValue = function(model, selector, propertyName) {
+		var element = document.querySelectorAll(selector)[0];
+		var action = function (e) {
+			model[propertyName] = e.target.value;
+		};
+
+		element.addEventListener("change", action);
+		action({ target: element });
 	}
 
 	dataBinding.to = {};
 	dataBinding.to.text = toText;
 
-	var fromValue = function(model, propertyName, selector) {
-		var element = document.querySelectorAll(selector)[0];
-		element.addEventListener("change", function (e) {
-			model[propertyName] = e.target.value;
-		});
-	}
-
 	dataBinding.from = {};
 	dataBinding.from.value = fromValue;
 
-
+	dataBinding.addDependency = addDependency;
 
 })(window.dataBinding = window.dataBinding || {})

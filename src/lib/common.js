@@ -6,3 +6,18 @@ function ready(fn) {
 		document.addEventListener('DOMContentLoaded', fn)
 	}
 }
+
+function forEach(obj, fn) {
+	for (index in obj) {
+		var item = obj[index];
+		fn(item);
+	}
+}
+
+function forEachProperty(obj, fn) {
+	for (var property in obj) {
+	    if (object.hasOwnProperty(property)) {
+	        fn(property);
+	    }
+	}
+}
