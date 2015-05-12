@@ -7,6 +7,11 @@ function ready(fn) {
 	}
 }
 
+function click(selector, fn) {
+	var element = document.querySelectorAll(selector)[0];
+	element.addEventListener('click', fn);
+}
+
 function forEach(obj, fn) {
 	for (index in obj) {
 		var item = obj[index];

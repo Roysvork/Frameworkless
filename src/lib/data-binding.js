@@ -21,45 +21,40 @@
 		if (typeof prop == "function") {
 			return (prop.wrapped) ? prop : wrap(prop, model);
 		}
-		else
-		{				
-			var getter = model.__lookupGetter__(propertyName);
-			if (getter && getter.wrapped) {
-				return getter;
-			}
 
-			getter = wrap(function() { return prop }, model);
-			Object.defineProperty(model, propertyName, {
-				get: getter,
-				set: function(newValue) { 
-					prop = newValue; 
-					getter.update();
-				}
-			});
-
+		var getter = model.__lookupGetter__(propertyName);
+		if (getter && getter.wrapped) {
 			return getter;
 		}
-	}
 
-	var addDependency = function (model, propertyName, dependencyName) {
-		var computed = ensureWrapped(model, propertyName);
-		var wrapper = ensureWrapped(model, dependencyName);
-		wrapper.actions.push(function (newValue) {
-			computed.update(model);
+		getter = wrap(function() { return prop }, model);
+		Object.defineProperty(model, propertyName, {
+			get: getter,
+			set: function(newValue) { 
+				prop = newValue; 
+				getter.update();
+			}
 		});
 
-		wrapper.update(model);
+		return getter;		
 	}
 
-	var toText = function (model, propertyName, selector) {
-		var element = document.querySelectorAll(selector)[0];
-		var wrapper = ensureWrapped(model, propertyName);
+	var toValue = function (value) {
+		this.value = value;
+	}
 
-		wrapper.actions.push(function (value) {
-			element.textContent = value;
-		});
+	var toText = function (value) {
+		this.textContent = value;
+	}
 
-		wrapper.update(model);
+	var write = function(fn) {
+		return function (model, propertyName, selector) {
+			var element = document.querySelectorAll(selector)[0];
+			var wrapper = ensureWrapped(model, propertyName);
+
+			wrapper.actions.push(fn.bind(element));
+			wrapper.update();
+		}
 	}
 
 	var fromValue = function(model, selector, propertyName) {
@@ -72,8 +67,19 @@
 		action({ target: element });
 	}
 
+	var addDependency = function (model, propertyName, dependencyName) {
+		var computed = ensureWrapped(model, propertyName);
+		var wrapper = ensureWrapped(model, dependencyName);
+		wrapper.actions.push(function (newValue) {
+			computed.update();
+		});
+
+		wrapper.update();
+	}
+
 	dataBinding.to = {};
-	dataBinding.to.text = toText;
+	dataBinding.to.text = write(toText);
+	dataBinding.to.value = write(toValue);
 
 	dataBinding.from = {};
 	dataBinding.from.value = fromValue;
