@@ -26,3 +26,10 @@ function forEachProperty(obj, fn) {
 	    }
 	}
 }
+
+function map(array, fn) {
+	var result = [];
+	forEach(array, function (item) {
+		result.push(fn(item));
+	})
+}
