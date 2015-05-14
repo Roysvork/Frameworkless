@@ -32,4 +32,6 @@ function map(array, fn) {
 	forEach(array, function (item) {
 		result.push(fn(item));
 	})
+	
+	return result;
 }

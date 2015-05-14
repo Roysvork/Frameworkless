@@ -8,6 +8,27 @@
 		<script type="text/javascript">
 			ready(function() {
 				
+				var helloService = {
+					sayHello: function (name) {
+						alert('Hello, ' + name);
+					}
+				}
+
+				var Demo = {
+					New: dependency.inject(['helloService'], function (helloService) {
+						var obj = {};
+						obj.hello = function() {
+							helloService.sayHello('Pete');
+						}
+
+						return obj;
+					})
+				}
+
+				dependency.registerInstance("helloService", helloService)
+
+				var demo = Demo.New();
+				demo.hello();
 			})
 		</script>
 	</body>
