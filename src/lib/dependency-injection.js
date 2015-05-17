@@ -1,16 +1,20 @@
 (function (dependency) {
 
-	var services = {};
+	var serviceProvider = {};
 
 	var registerInstance = function (identifier, service) {
-		services[identifier] = service;
+		serviceProvider[identifier] = function() { return service; }
+	}
+
+	var register = function (identifier, serviceProvider) {
+		serviceProvider[identifier] = serviceProvider;
 	}
 
 	var inject = function (identifiers, fn) {
 		var invoker = function() {
 			var args = map(arguments, function(arg) { return arg; });
 			var dependencies = map(identifiers, function(identifier) {
-				return services[identifier]
+				return serviceProvider[identifier]();
 			});
 			
 			return fn.apply(this, dependencies.concat(args))

@@ -16,6 +16,7 @@
 
 				var Demo = {
 					New: dependency.inject(['helloService'], function (helloService) {
+						
 						var obj = {};
 						obj.hello = function() {
 							helloService.sayHello('Pete');
