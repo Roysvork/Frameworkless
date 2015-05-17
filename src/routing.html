@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<title>Lifestyles of the rich and Frameworkless - Routing Demo</title>
+	</head>
+	<body>
+		<a href="#test2">Go Somewhere<a>
+		<input type="button" id="goSomewhere" value="Go!" />
+		<script type="text/javascript" src="lib/common.js"></script>
+		<script type="text/javascript" src="lib/routing.js"></script>
+		<script type="text/javascript">
+			ready(function() {
+
+				var constant = routing.constant;
+				var alpha = routing.alpha;
+
+				routing.define(function(o) { o / constant("items") / alpha("id") });
+
+				console.log(routing.execute("#/items/2")) 
+
+				click("#goSomewhere", function() {
+					routing.setHash("#test");
+				});
+			})
+		</script>
+	</body>
+</html>

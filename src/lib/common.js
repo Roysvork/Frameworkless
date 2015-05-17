@@ -35,3 +35,35 @@ function map(array, fn) {
 	
 	return result;
 }
+
+function first(array, fn) {
+	for (index in array) {
+		var item = array[index];
+		if (fn(item)) {
+			return item;
+		}
+	}
+
+	return null;
+}
+
+var compose = function(obj, fn) {
+	fn(obj);
+	return obj;
+}
+
+var extend = function(out) {
+  out = out || {};
+
+  for (var i = 1; i < arguments.length; i++) {
+    if (!arguments[i])
+      continue;
+
+    for (var key in arguments[i]) {
+      if (arguments[i].hasOwnProperty(key))
+        out[key] = arguments[i][key];
+    }
+  }
+
+  return out;
+};
