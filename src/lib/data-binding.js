@@ -77,6 +77,17 @@
 		wrapper.update();
 	}
 
+	var observe = function (model, propertyName, fn) {
+		var wrapper = ensureWrapped(model, propertyName);
+		wrapper.actions.push(function (newValue) {
+			fn(newValue);
+		})
+
+		wrapper.update();
+	}
+
+	dataBinding.observe = observe;
+
 	dataBinding.to = {};
 	dataBinding.to.text = write(toText);
 	dataBinding.to.value = write(toValue);

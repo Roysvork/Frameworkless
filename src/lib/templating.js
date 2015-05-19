@@ -4,7 +4,8 @@
 		var template = document.querySelector(templateSelector).content;
 
 		var renderTo = function(targetSelector) {
-			var target = document.querySelector(targetSelector)
+			var target = document.querySelector(targetSelector);
+			target.innerHTML = "";
 			forEach(data, function(item) {
 				fn(item, template);
 				target.appendChild(document.importNode(template, true));

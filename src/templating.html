@@ -10,25 +10,33 @@
 
 		<ul id="list">
 			
-		</uk>
+		</ul>
+		<input type="text" id="newValue" value="Another item" />
+		<input type="button" id="addButton" value="Add another" />
 
 		<script type="text/javascript" src="lib/common.js"></script>
-		<script type="text/javascript" src="lib/templating.js"></script>
+		<script type="text/javascript" src="lib/templating.js"></script>		
+		<script type="text/javascript" src="lib/data-binding.js"></script>
 		<script type="text/javascript">
 			ready(function() {
 
-				var data = [
-					{ "description": "Item one" },
-					{ "description": "Item two" },
-					{ "description": "Item three" },
-				]
+				var viewModel = {
+					data: ["Item one", "Item two", "Item three"]
+				}
 
-				templating.repeat(data, "#list-item", function (item, content) {
+				dataBinding.observe(viewModel, "data", function(value) {
+					templating.repeat(value, "#list-item", function (item, content) {
 
-					var li = content.querySelector("li")
-					li.textContent = item.description;
+						var li = content.querySelector("li");
+						li.textContent = item;
 
-				}).renderTo("#list");
+					}).renderTo("#list");
+				})
+
+				click("#addButton", function() {
+					var value = document.querySelector("#newValue").value;
+					viewModel.data = viewModel.data.concat([value]);
+				})
 				
 			})
 		</script>
