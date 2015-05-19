@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title>Lifestyles of the rich and Frameworkless - Templating Demo</title>
+	</head>
+	<body>
+
+		<template id="list-item">
+			<li class="description"></li>
+		</template>
+
+		<ul id="list">
+			
+		</uk>
+
+		<script type="text/javascript" src="lib/common.js"></script>
+		<script type="text/javascript" src="lib/templating.js"></script>
+		<script type="text/javascript">
+			ready(function() {
+
+				var data = [
+					{ "description": "Item one" },
+					{ "description": "Item two" },
+					{ "description": "Item three" },
+				]
+
+				templating.repeat(data, "#list-item", function (item, content) {
+
+					var li = content.querySelector("li")
+					li.textContent = item.description;
+
+				}).renderTo("#list");
+				
+			})
+		</script>
+	</body>
+</html>
