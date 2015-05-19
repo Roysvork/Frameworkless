@@ -67,3 +67,27 @@ var extend = function(out) {
 
   return out;
 };
+
+var operatorOverload = function() {
+	var context = {};
+	var args = map(arguments, function(o) { return o });
+
+	forEach(args, function(arg) {
+		var constructor = arg[0];
+		var apply = arg[1];
+
+		constructor.prototype.valueOf = function() {
+			context.result = compose(this, function (obj) { 
+				if (context.result) {
+					apply(context.result, obj);
+				}
+			});
+		};
+	})
+
+	return {
+		evaluate: function(input) {
+			return context.result;
+		}
+	};
+};

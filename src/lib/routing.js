@@ -1,28 +1,4 @@
-(function(routing) {
-
-	window.addEventListener('hashchange', function(e) {
-		hashChanged();
-	});
-
-	document.addEventListener('click', function (e) {
-		var target = e.target;
-		if (target.localName === "a" && target.href === window.location.href) {
-			setHash(target.hash)
-		}
-	})
-
-	var setHash = function (hash) {
-		history.pushState(null, window.title, hash)
-		hashChanged();
-	}
-
-	var getHash = function () {
-		return window.location.hash;
-	}
-
-	var hashChanged = function() {
-		alert(getHash());
-	}
+(function(routing, hashChange) {
 
 	var routeNode = function () {
 		this.edges = [];
@@ -70,22 +46,12 @@
 		this.fn = fn;
 	}
 
-	var define = function(fn) {
-		var context = {};
-		routeNode.prototype.valueOf = function () {
-            context.leftOperand = compose(this, function (node) { 
-            	if (context.leftOperand) context.leftOperand.slash(node);
-            });
-        };
-
-        handler.prototype.valueOf = function () {
-        	context.leftOperand = compose(this, function (wrapper) { 
-            	if (context.leftOperand) context.leftOperand.handler = wrapper.fn;
-            });
-        }
-
-		fn(baseNode);
-		return context.leftOperand;
+	var define = function(fn) {		
+		var expression = operatorOverload(
+        	[routeNode, function(o, node) { o.slash(node) }],
+        	[handler, function(o, wrapper) { o.handler = wrapper.fn }]);
+		
+		return expression.evaluate(fn(baseNode));
 	}
 
 	var execute = function(url) {
@@ -93,12 +59,10 @@
 	}
 
 	var baseNode = constant("#")
-	routing.setHash = setHash;
-	routing.getHash = getHash;
 
 	routing.alpha = alpha;
 	routing.constant = constant;
 	routing.define = define;
 	routing.execute = execute;
 
-}(window.routing = window.routing || {}))
+}(window.routing = window.routing || {}, window.hashchange))
