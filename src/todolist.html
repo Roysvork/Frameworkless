@@ -1,0 +1,72 @@
+<html>
+	<head>
+		<title>Lifestyles of the rich and Frameworkless - Templating Demo</title>
+	</head>
+	<body>
+
+		<h2>Frameworkless Todo List</h2>
+		<ul id="list">			
+		</ul>
+		<input type="button" id="addButton" value="add" />
+
+		<template id="list-item">
+			<li>
+				<input type="checkbox" name="done" />
+				<label for="done"><a>Testing</a></label>
+				<div class="editor hidden">
+					<input type="text" name="description"></template>
+				</div>
+			</li>
+		</template>
+
+		<script type="text/javascript" src="lib/common.js"></script>
+		<script type="text/javascript" src="lib/hash-change.js"></script>
+		<script type="text/javascript" src="lib/routing.js"></script>
+		<script type="text/javascript" src="lib/data-binding.js"></script>
+		<script type="text/javascript" src="lib/dependency-injection.js"></script>
+		<script type="text/javascript" src="lib/templating.js"></script>
+
+		<script type="text/javascript" src="lib/repository.js"></script>
+		<script type="text/javascript">
+
+		var viewModel = dependency.inject(['repository'], function(repository) {
+			this.getItems = function () {
+				return repository.getAll()
+			};
+			this.addClick = function () {
+				var newItem = {
+					editing: true,
+					description: "New item",
+					done: false
+				}
+
+				repository.add(newItem);
+				this.getItems.update();
+			}.bind(this);
+		});
+
+		ready(function() {			
+			var model = new viewModel();
+
+			dataBinding.observe(model, "getItems", function (newValue) {
+				templating.repeat(newValue, "#list-item", function(item, content) {
+
+					dataBinding.to.text(item, "description", "li > label", content);
+					//dataBinding.to.checked(item, "input", "done", content);
+
+				}).renderTo("#list")
+			});
+
+			click("#addButton", model.addClick);			
+		});
+
+		</script>
+
+		<style>
+			.hidden {
+				display: none;	
+			}
+		</style>
+
+	</body>
+</html>

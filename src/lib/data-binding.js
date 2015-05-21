@@ -48,8 +48,9 @@
 	}
 
 	var write = function(fn) {
-		return function (model, propertyName, selector) {
-			var element = document.querySelectorAll(selector)[0];
+		return function (model, propertyName, selector, container) {
+			container = container || document;
+			var element = container.querySelectorAll(selector)[0];
 			var wrapper = ensureWrapped(model, propertyName);
 
 			wrapper.actions.push(fn.bind(element));
@@ -57,8 +58,9 @@
 		}
 	}
 
-	var fromValue = function(model, selector, propertyName) {
-		var element = document.querySelectorAll(selector)[0];
+	var fromValue = function(model, selector, propertyName, container) {
+		container = container || document;
+		var element = container.querySelectorAll(selector)[0];
 		var action = function (e) {
 			model[propertyName] = e.target.value;
 		};
