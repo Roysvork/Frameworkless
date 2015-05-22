@@ -13,9 +13,14 @@
 			<li>
 				<input type="checkbox" name="done" />
 				<label for="done"><a>Testing</a></label>
-				<div class="editor hidden">
-					<input type="text" name="description"></template>
-				</div>
+				<fieldset class="editor hidden">
+					<legend>Edit</legend>
+					<span>
+						<label for="summary">Summary</label>
+						<input type="text" name="summary"/>
+					</span>					
+					<input type="button" name="removeBtn" value="Remove"/>
+				</fieldset>
 			</li>
 		</template>
 
@@ -33,31 +38,55 @@
 			this.getItems = function () {
 				return repository.getAll()
 			};
+
 			this.addClick = function () {
 				var newItem = {
 					editing: true,
-					description: "New item",
+					summary: "New item",
 					done: false
 				}
 
 				repository.add(newItem);
 				this.getItems.update();
 			}.bind(this);
+
+			this.removeClick = function (item) {
+				repository.remove(item);
+				this.getItems.update();
+			}
 		});
 
 		ready(function() {			
 			var model = new viewModel();
 
+			click("#addButton", model.addClick);
 			dataBinding.observe(model, "getItems", function (newValue) {
-				templating.repeat(newValue, "#list-item", function(item, content) {
 
-					dataBinding.to.text(item, "description", "li > label", content);
-					//dataBinding.to.checked(item, "input", "done", content);
+				templating.repeat(newValue, "#list-item").renderTo("#list", document, function(item, content) {
+					dataBinding.clear(item, "done");
 
-				}).renderTo("#list")
+					dataBinding.to.text(item, "summary", "label", content);
+					dataBinding.to.showHide(item, "editing", "fieldset", content);
+					
+					var textSelector = "fieldset > span > input[type=text]";
+					dataBinding.to.value(item, "summary", textSelector, content);
+					dataBinding.from.value(item, textSelector, "summary", content);
+					
+					dataBinding.to.checked(item, "done", "input", content);
+					dataBinding.to.strikeThrough(item, "done", "label", content);
+					dataBinding.from.checked(item, "input", "done", content);
+
+					click("fieldset > input", function () {
+						model.removeClick(item);
+					}, content);
+
+					click("label", function() {
+						item.editing = !item.editing;
+					}, content);
+
+				});
 			});
-
-			click("#addButton", model.addClick);			
+		
 		});
 
 		</script>
@@ -65,6 +94,9 @@
 		<style>
 			.hidden {
 				display: none;	
+			}
+			li > label {
+				cursor: pointer;
 			}
 		</style>
 

@@ -47,6 +47,30 @@
 		this.textContent = value;
 	}
 
+	var toChecked = function (value) {
+		this.checked = value;
+	}
+
+	var toShowHide = function (value) {
+		if (value) {
+			this.classList.add("hidden");
+		}
+		else
+		{
+			this.classList.remove("hidden");
+		}
+	}
+
+	var toStrikeThrough = function (value) {
+		if (value) {							
+			this.style.setProperty("text-decoration", "line-through");
+		}
+		else
+		{
+			this.style.setProperty("text-decoration", "none");
+		}
+	};
+
 	var write = function(fn) {
 		return function (model, propertyName, selector, container) {
 			container = container || document;
@@ -59,15 +83,23 @@
 	}
 
 	var fromValue = function(model, selector, propertyName, container) {
-		container = container || document;
-		var element = container.querySelectorAll(selector)[0];
-		var action = function (e) {
+		return read(container, selector, "change", function (e) {
 			model[propertyName] = e.target.value;
-		};
-
-		element.addEventListener("change", action);
-		action({ target: element });
+		});
 	}
+
+	var fromChecked = function(model, selector, propertyName, container) {
+		return read(container, selector, "change", function (e) {
+			model[propertyName] = e.target.checked;
+		});
+	}
+
+	var read = function(container, selector, event, fn) {
+		var element = (container || document).querySelector(selector);		
+		element.addEventListener(event, fn);
+		fn({ target: element });
+	}
+
 
 	var addDependency = function (model, propertyName, dependencyName) {
 		var computed = ensureWrapped(model, propertyName);
@@ -88,15 +120,25 @@
 		wrapper.update();
 	}
 
+	var clear = function (model, propertyName) {
+		var wrapper = ensureWrapped(model, propertyName);
+		wrapper.actions.length = 0;
+	}
+
 	dataBinding.observe = observe;
 
 	dataBinding.to = {};
 	dataBinding.to.text = write(toText);
 	dataBinding.to.value = write(toValue);
+	dataBinding.to.checked = write(toChecked);
+	dataBinding.to.showHide = write(toShowHide);
+	dataBinding.to.strikeThrough = write(toStrikeThrough);
 
 	dataBinding.from = {};
 	dataBinding.from.value = fromValue;
+	dataBinding.from.checked = fromChecked;
 
+	dataBinding.clear = clear;
 	dataBinding.addDependency = addDependency;
 
 })(window.dataBinding = window.dataBinding || {})
