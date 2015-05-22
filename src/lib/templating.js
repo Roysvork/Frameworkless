@@ -1,16 +1,18 @@
 (function (templating) {
 
-	var repeat = function (data, templateSelector, fn) {
+	var repeat = function (data, templateSelector) {
 		var template = document.querySelector(templateSelector).content;
 
-		var renderTo = function(targetSelector, container) {
+		var renderTo = function(targetSelector, container, fn) {
 			var container = container || document;
 			var target = container.querySelector(targetSelector);
 			target.innerHTML = "";
+
 			forEach(data, function(item) {
-				fn(item, template);
-				target.appendChild(document.importNode(template, true));
-			})
+				var element = document.importNode(template, true);
+				fn(item, element.firstElementChild);
+				target.appendChild(element);
+			});
 		} 
 
 		return {

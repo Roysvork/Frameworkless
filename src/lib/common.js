@@ -7,8 +7,8 @@ function ready(fn) {
 	}
 }
 
-function click(selector, fn) {
-	var element = document.querySelectorAll(selector)[0];
+function click(selector, fn, container) {
+	var element = (container || document).querySelector(selector);
 	element.addEventListener('click', fn);
 }
 
