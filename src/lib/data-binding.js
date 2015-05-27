@@ -22,7 +22,7 @@
 			return (prop.wrapped) ? prop : wrap(prop, model);
 		}
 
-		var getter = model.__lookupGetter__(propertyName);
+		var getter = getGetter(model, propertyName);
 		if (getter && getter.wrapped) {
 			return getter;
 		}

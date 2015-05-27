@@ -47,6 +47,10 @@ function first(array, fn) {
 	return null;
 }
 
+var getGetter = function (model, propertyName) {
+	return model.__lookupGetter__(propertyName)
+}
+
 var compose = function(obj, fn) {
 	fn(obj);
 	return obj;
