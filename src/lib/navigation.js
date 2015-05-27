@@ -1,4 +1,4 @@
-(function (hashChange) {
+(function (navigation) {
 
 	window.addEventListener('hashchange', function(e) {
 		hashChanged();
@@ -17,7 +17,7 @@
 	}
 
 	var eventListeners = [];
-	var onHashChanged = function(fn) {
+	var onHashChange = function(fn) {
 		eventListeners.push(fn);
 	}
 
@@ -27,7 +27,7 @@
 		})
 	}
 
-	hashChange.setHash = setHash;
-	hashChange.onHashChanged = onHashChanged;
+	navigation.setHash = setHash;
+	navigation.onHashChange = onHashChange;
 
-}(window.hashChange = window.hashChange || {}));
+}(window.navigation = window.navigation || {}));

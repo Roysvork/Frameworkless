@@ -6,6 +6,7 @@
 		<a href="#test2">Go Somewhere<a>
 		<input type="button" id="goSomewhere" value="Go!" />
 		<script type="text/javascript" src="lib/common.js"></script>
+		<script type="text/javascript" src="lib/navigation.js"></script>
 		<script type="text/javascript" src="lib/routing.js"></script>
 		<script type="text/javascript">
 			ready(function() {
@@ -13,12 +14,17 @@
 				var constant = routing.constant;
 				var alpha = routing.alpha;
 
-				routing.define(function(o) { o / constant("items") / alpha("id") });
+				var items = routing.define(function(o) { o / constant("items") / alpha("id") });
+				items.handler = function(params) {
+					alert(params.id);
+				}
 
-				console.log(routing.execute("#/items/2")) 
+				navigation.onHashChange(function(hash) {
+					routing.execute(hash);
+				});
 
 				click("#goSomewhere", function() {
-					routing.setHash("#test");
+					navigation.setHash("#/items/2");
 				});
 			})
 		</script>

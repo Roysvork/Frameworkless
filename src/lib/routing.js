@@ -1,4 +1,4 @@
-(function(routing, hashChange) {
+(function(routing) {
 
 	var routeNode = function () {
 		this.edges = [];
@@ -6,16 +6,32 @@
 		this.match = function (segments) {};
 	}
 
+	var traverseResult = function (_parameters, _handler) {
+		this.parameters = _parameters;
+		this.handler = _handler;
+	}
+
+	traverseResult.prototype.extend = function (other) {
+		return new traverseResult(
+			extend({}, this.parameters, other.parameters), 
+			other.handler || this.handler)
+	}
+
+	traverseResult.prototype.invokeHandler = function() {
+		if (this.handler) this.handler(this.parameters);
+	}
+
 	var findNextMatch = function (edges, segments) {
 		return segments.length == 0 ? null : first(edges, function(edge) {
 			return edge.match(segments[0]);
 		});
-	};
+	}
 
 	routeNode.prototype.traverse = function (segments) {
-		var parameters = this.action(segments.shift());
+		var result = new traverseResult(this.action(segments.shift()), this.handler);
 		var next = findNextMatch(this.edges, segments);
-		return next ? extend({}, parameters, next.traverse(segments)) : parameters;
+
+		return next ? result.extend(next.traverse(segments)) : result;
 	}
 
 	routeNode.prototype.slash = function (next) {
@@ -37,25 +53,22 @@
 				return /^[a-zA-Z0-9-_]+$/.test(segment);
 			}
 			node.action = function (value) {
-				return compose({}, function (_) { _[name] = value });
+				return compose({}, function (_) { 
+					_[name] = value 
+				});
 			}
 		});
 	}
 
-	var handler = function (fn) {
-		this.fn = fn;
-	}
-
 	var define = function(fn) {		
 		var expression = operatorOverload(
-        	[routeNode, function(o, node) { o.slash(node) }],
-        	[handler, function(o, wrapper) { o.handler = wrapper.fn }]);
+			[routeNode, function(o, node) { o.slash(node) }]);
 		
 		return expression.evaluate(fn(baseNode));
 	}
 
 	var execute = function(url) {
-		return baseNode.traverse(url.split("/"));
+		baseNode.traverse(url.split("/")).invokeHandler();
 	}
 
 	var baseNode = constant("#")
@@ -65,4 +78,4 @@
 	routing.define = define;
 	routing.execute = execute;
 
-}(window.routing = window.routing || {}, window.hashchange))
+}(window.routing = window.routing || {}))
