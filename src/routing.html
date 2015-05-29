@@ -3,7 +3,7 @@
 		<title>Lifestyles of the rich and Frameworkless - Routing Demo</title>
 	</head>
 	<body>
-		<a href="#test2">Go Somewhere<a>
+		<a href="#/items">Go Somewhere<a>
 		<input type="button" id="goSomewhere" value="Go!" />
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/navigation.js"></script>
@@ -14,8 +14,16 @@
 				var constant = routing.constant;
 				var alpha = routing.alpha;
 
-				var items = routing.define(function(o) { o / constant("items") / alpha("id") });
+				var initial = routing.define(function (o) { o / constant("items") / alpha("id")});
+
+				var items = routing.define(function(o) { o / constant("items") });
+				var anItem = routing.define(function(o) { items / alpha("id") });
+
 				items.handler = function(params) {
+					alert("Items");
+				}
+
+				anItem.handler = function(params) {
 					alert(params.id);
 				}
 
