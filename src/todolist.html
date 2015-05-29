@@ -25,7 +25,7 @@
 		</template>
 
 		<script type="text/javascript" src="lib/common.js"></script>
-		<script type="text/javascript" src="lib/hash-change.js"></script>
+		<script type="text/javascript" src="lib/navigation.js"></script>
 		<script type="text/javascript" src="lib/routing.js"></script>
 		<script type="text/javascript" src="lib/data-binding.js"></script>
 		<script type="text/javascript" src="lib/dependency-injection.js"></script>
@@ -70,11 +70,11 @@
 					
 					var textSelector = "fieldset > span > input[type=text]";
 					dataBinding.to.value(item, "summary", textSelector, content);
-					dataBinding.from.value(item, textSelector, "summary", content);
+					dataBinding.from.value(item, "summary", textSelector, content);
 					
 					dataBinding.to.checked(item, "done", "input", content);
 					dataBinding.to.strikeThrough(item, "done", "label", content);
-					dataBinding.from.checked(item, "input", "done", content);
+					dataBinding.from.checked(item, "done", "input", content);
 
 					click("fieldset > input", function () {
 						model.removeClick(item);

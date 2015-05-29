@@ -1,24 +1,21 @@
 (function (dataBinding) {
 
 	var wrap = function(fn, model) {
-		var actions = [];
-		var update = function() { 
+		fn.wrapped = true;
+		fn.actions = [];
+		fn.update = function() { 
 			var result = fn.bind(model)();
-			forEach(actions, function (action) {				
+			forEach(fn.actions, function (action) {				
 				action(result);
 			});
-		}
-
-		fn.wrapped = true;
-		fn.actions = actions;
-		fn.update = update;
+		};
 
 		return fn;
-	}
+	};
 
 	var ensureWrapped = function (model, propertyName) {
 		var prop = model[propertyName];
-		if (typeof prop == "function") {
+		if (typeof prop === "function") {
 			return (prop.wrapped) ? prop : wrap(prop, model);
 		}
 
@@ -27,7 +24,7 @@
 			return getter;
 		}
 
-		getter = wrap(function() { return prop }, model);
+		getter = wrap(function() { return prop; }, model);
 		Object.defineProperty(model, propertyName, {
 			get: getter,
 			set: function(newValue) { 
@@ -37,19 +34,36 @@
 		});
 
 		return getter;		
-	}
+	};
+
+	var write = function(fn) {
+		return function (model, propertyName, selector, container) {
+			container = container || document;
+			var element = container.querySelectorAll(selector)[0];
+			var property = ensureWrapped(model, propertyName);
+
+			property.actions.push(fn.bind(element));
+			property.update();
+		};
+	};
+	
+	var read = function(container, selector, event, fn) {
+		var element = (container || document).querySelector(selector);		
+		element.addEventListener(event, fn);
+		fn({ target: element });
+	};
 
 	var toValue = function (value) {
 		this.value = value;
-	}
+	};
 
 	var toText = function (value) {
 		this.textContent = value;
-	}
+	};
 
 	var toChecked = function (value) {
 		this.checked = value;
-	}
+	};
 
 	var toShowHide = function (value) {
 		if (value) {
@@ -59,7 +73,7 @@
 		{
 			this.classList.remove("hidden");
 		}
-	}
+	};
 
 	var toStrikeThrough = function (value) {
 		if (value) {							
@@ -71,59 +85,41 @@
 		}
 	};
 
-	var write = function(fn) {
-		return function (model, propertyName, selector, container) {
-			container = container || document;
-			var element = container.querySelectorAll(selector)[0];
-			var wrapper = ensureWrapped(model, propertyName);
-
-			wrapper.actions.push(fn.bind(element));
-			wrapper.update();
-		}
-	}
-
-	var fromValue = function(model, selector, propertyName, container) {
+	var fromValue = function(model, propertyName, selector, container) {
 		return read(container, selector, "change", function (e) {
 			model[propertyName] = e.target.value;
 		});
-	}
+	};
 
-	var fromChecked = function(model, selector, propertyName, container) {
+	var fromChecked = function(model, propertyName, selector, container) {
 		return read(container, selector, "change", function (e) {
 			model[propertyName] = e.target.checked;
 		});
-	}
-
-	var read = function(container, selector, event, fn) {
-		var element = (container || document).querySelector(selector);		
-		element.addEventListener(event, fn);
-		fn({ target: element });
-	}
-
+	};
 
 	var addDependency = function (model, propertyName, dependencyName) {
-		var computed = ensureWrapped(model, propertyName);
-		var wrapper = ensureWrapped(model, dependencyName);
-		wrapper.actions.push(function (newValue) {
-			computed.update();
-		});
+		var property = ensureWrapped(model, propertyName);
+		var dependency = ensureWrapped(model, dependencyName);
+		dependency.actions.push(function () {
+			property.update();
+		});	
 
-		wrapper.update();
-	}
+		property.update();
+	};
 
 	var observe = function (model, propertyName, fn) {
-		var wrapper = ensureWrapped(model, propertyName);
-		wrapper.actions.push(function (newValue) {
+		var property = ensureWrapped(model, propertyName);
+		property.actions.push(function (newValue) {
 			fn(newValue);
-		})
+		});
 
-		wrapper.update();
-	}
+		property.update();
+	};
 
 	var clear = function (model, propertyName) {
-		var wrapper = ensureWrapped(model, propertyName);
-		wrapper.actions.length = 0;
-	}
+		var property = ensureWrapped(model, propertyName);
+		property.actions.length = 0;
+	};
 
 	dataBinding.observe = observe;
 
@@ -141,4 +137,4 @@
 	dataBinding.clear = clear;
 	dataBinding.addDependency = addDependency;
 
-})(window.dataBinding = window.dataBinding || {})
+})(window.dataBinding = window.dataBinding || {});

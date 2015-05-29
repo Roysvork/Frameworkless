@@ -5,12 +5,6 @@
 	<body>
 		<input type="text" id="name" value="Pete" />
 		<p id="greeting"></p>
-		<input type="button" id="resetButton" value="Reset" />
-
-		<hr>
-		<input type="text" id="left" value="1" /> +
-		<input type="text" id="right" value="2" /> = 
-		<p id="result"></p>
 
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/data-binding.js"></script>
@@ -19,35 +13,16 @@
 				var value = "test";
 				var viewModel = {
 					name: "pete",
-					greeting: function() {
+					greeting: function () {
 						return "Hello, " + this.name;
 					}
 				}
 
-				var calculator = {
-					left: 1,
-					right: 2,
-					result: function() { return this.left + this.right; }
-				}
+				dataBinding.from.value(viewModel, "name", "#name");
+				dataBinding.to.text(viewModel, "greeting", "#greeting");
 
-				dataBinding.from.value(viewModel, "#name", "name");
-				dataBinding.to.value(viewModel, "name", "#name");
-
-				dataBinding.to.text(viewModel, "greeting", "#greeting");				
 				dataBinding.addDependency(viewModel, "greeting", "name");
-
-				click("#resetButton", function () {
-					viewModel.name = "World!"
-				})
-
-				dataBinding.from.value(calculator, "#left", "left");
-				dataBinding.from.value(calculator, "#right", "right");
-
-				dataBinding.to.text(calculator, "result", "#result")
-
-				dataBinding.addDependency(calculator, "result", "left");
-				dataBinding.addDependency(calculator, "result", "right");
-			})
+			});
 		</script>
 	</body>
 </html>
