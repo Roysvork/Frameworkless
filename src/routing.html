@@ -7,25 +7,16 @@
 		<input type="button" id="goSomewhere" value="Go!" />
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/navigation.js"></script>
-		<script type="text/javascript" src="lib/routing.js"></script>
+		<script type="text/javascript" src="lib/routing-2.js"></script>
 		<script type="text/javascript">
 			ready(function() {
 
-				var constant = routing.constant;
-				var alpha = routing.alpha;
+				// matches a route in the form #/items/1
+				var items = routing.define(function (o) { o / routing.constant("items") });
+				var anItem = routing.define(function () { items / routing.alpha("id"); });
 
-				var initial = routing.define(function (o) { o / constant("items") / alpha("id")});
-
-				var items = routing.define(function(o) { o / constant("items") });
-				var anItem = routing.define(function(o) { items / alpha("id") });
-
-				items.handler = function(params) {
-					alert("Items");
-				}
-
-				anItem.handler = function(params) {
-					alert(params.id);
-				}
+				items.handler = function () { alert("items"); };
+				anItem.handler = function (parameters) {  alert(parameters.id); };
 
 				navigation.onHashChange(function(hash) {
 					routing.execute(hash);

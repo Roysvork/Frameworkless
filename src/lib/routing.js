@@ -6,21 +6,17 @@
 		this.action = function (value) {};
 	};
 
-	var constant = function (template) {
-		return compose(new routeNode(), function (node) {
-			node.match = function (segment) { return segment === template; };
+	routeNode.prototype.findNextMatch = function (segments) {
+		return segments.length === 0 ? null : first(this.edges, function (edge) {
+			return edge.match(segments[0]);
 		});
 	};
 
-	var alpha = function (name) {
-		return compose(new routeNode(), function (node) {
-			node.match = function (segment) {
-				return /^[a-zA-Z0-9-_]+$/.test(segment);
-			};
-			node.action = function (value) {
-				return compose({}, function (_) { _[name] = value; });
-			};
-		});
+	routeNode.prototype.traverse = function (segments) {
+		var result = new traverseResult(this.action(segments.shift()), this.handler);
+		var next = this.findNextMatch(segments);
+
+		return next ? result.extend(next.traverse(segments)) : result;
 	};
 
 	var traverseResult = function (_parameters, _handler) {
@@ -38,17 +34,21 @@
 		if (this.handler) this.handler(this.parameters);
 	};
 
-	var findNextMatch = function (edges, segments) {
-		return segments.length === 0 ? null : first(edges, function(edge) {
-			return edge.match(segments[0]);
+	var constant = function (template) {
+		return compose(new routeNode(), function (node) {
+			node.match = function (segment) { return segment === template; };
 		});
 	};
 
-	routeNode.prototype.traverse = function (segments) {
-		var result = new traverseResult(this.action(segments.shift()), this.handler);
-		var next = findNextMatch(this.edges, segments);
-
-		return next ? result.extend(next.traverse(segments)) : result;
+	var alpha = function (name) {
+		return compose(new routeNode(), function (node) {
+			node.match = function (segment) {
+				return /^[a-zA-Z0-9-_]+$/.test(segment);
+			};
+			node.action = function (value) {
+				return compose({}, function (_) { _[name] = value; });
+			};
+		});
 	};
 
 	var define = function(fn) {		
@@ -59,14 +59,14 @@
 		return expression.evaluate(fn(baseNode));
 	};
 
+	var baseNode = constant("#");
+
 	var execute = function(url) {
 		baseNode.traverse(url.split("/")).invokeHandler();
 	};
 
-	var baseNode = constant("#");
-
-	routing.alpha = alpha;
 	routing.constant = constant;
+	routing.alpha = alpha;
 	routing.define = define;
 	routing.execute = execute;
 
