@@ -19,14 +19,6 @@ function forEach(obj, fn) {
 	}
 }
 
-function forEachProperty(obj, fn) {
-	for (var property in obj) {
-	    if (object.hasOwnProperty(property)) {
-	        fn(property);
-	    }
-	}
-}
-
 function map(array, fn) {
 	var result = [];
 	forEach(array, function (item) {
