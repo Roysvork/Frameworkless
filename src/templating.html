@@ -24,13 +24,12 @@
 					data: ["Item one", "Item two", "Item three"]
 				}
 
+				var listItem = templating.repeat("#list-item", function (item, li) {
+					li.textContent = item;
+				});
+
 				dataBinding.observe(viewModel, "data", function(value) {
-					templating.repeat(value, "#list-item", function (item, content) {
-
-						var li = content.querySelector("li");
-						li.textContent = item;
-
-					}).renderTo("#list");
+					listItem.render(value).to("#list");
 				})
 
 				click("#addButton", function() {

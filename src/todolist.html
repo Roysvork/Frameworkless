@@ -60,31 +60,32 @@
 			var model = new viewModel();
 
 			click("#addButton", model.addClick);
+
+			var listItem = templating.repeat("#list-item", function(item, content) {
+				dataBinding.clear(item, "done");
+
+				dataBinding.to.text(item, "summary", "label", content);
+				dataBinding.to.showHide(item, "editing", "fieldset", content);
+				
+				var textSelector = "fieldset > span > input[type=text]";
+				dataBinding.to.value(item, "summary", textSelector, content);
+				dataBinding.from.value(item, "summary", textSelector, content);
+				
+				dataBinding.to.checked(item, "done", "input", content);
+				dataBinding.to.strikeThrough(item, "done", "label", content);
+				dataBinding.from.checked(item, "done", "input", content);
+
+				click("fieldset > input", function () {
+					model.removeClick(item);
+				}, content);
+
+				click("label", function() {
+					item.editing = !item.editing;
+				}, content);
+			});
+
 			dataBinding.observe(model, "getItems", function (newValue) {
-
-				templating.repeat(newValue, "#list-item").renderTo("#list", document, function(item, content) {
-					dataBinding.clear(item, "done");
-
-					dataBinding.to.text(item, "summary", "label", content);
-					dataBinding.to.showHide(item, "editing", "fieldset", content);
-					
-					var textSelector = "fieldset > span > input[type=text]";
-					dataBinding.to.value(item, "summary", textSelector, content);
-					dataBinding.from.value(item, "summary", textSelector, content);
-					
-					dataBinding.to.checked(item, "done", "input", content);
-					dataBinding.to.strikeThrough(item, "done", "label", content);
-					dataBinding.from.checked(item, "done", "input", content);
-
-					click("fieldset > input", function () {
-						model.removeClick(item);
-					}, content);
-
-					click("label", function() {
-						item.editing = !item.editing;
-					}, content);
-
-				});
+				listItem.render(newValue).to("#list");				
 			});
 		
 		});
