@@ -1,35 +1,48 @@
 (function (templating) {
 
-	var fluentRepeater = function (_template, _fn) {
+	var fluentTemplate = function (_template, _fn, _action) {
 		this.template = _template;
 		this.fn = _fn;
-	};
+		this.action = _action;
+	}
 
-	fluentRepeater.prototype.render = function (_data) {
+	fluentTemplate.prototype.createElement = function (model) {
+		return compose(document.importNode(this.template, true), function (el) {
+			this.fn(model, el.firstElementChild);
+		}.bind(this));
+	}
+
+	fluentTemplate.prototype.render = function (_data) {
 		this.data = _data;
 		return this;
 	};
 
-	fluentRepeater.prototype.to = function (targetSelector, container) {
+	fluentTemplate.prototype.to = function (targetSelector, container) {
+		var target = (container || document).querySelector(targetSelector);
+		this.action(target);
+	}
+
+	var single = function(templateSelector, fn, container) {
 		container = container || document;
-		var target = container.querySelector(targetSelector);
-		target.innerHTML = "";
+		var template = container.querySelector(templateSelector).content;
 
-		forEach(this.data, function(item) {
-			var element = container.importNode(this.template, true);
-			this.fn(item, element.firstElementChild);
-			target.appendChild(element);
-		}.bind(this));
-
-		return this;
+		return new fluentTemplate(template, fn, function (target) {
+			target.appendChild(this.createElement(this.data));
+		});
 	};
 
 	var repeat = function (templateSelector, fn, container) {
 		container = container || document;
 		var template = container.querySelector(templateSelector).content;
-		return new fluentRepeater(template, fn);
+
+		return new fluentTemplate(template, fn, function (target) {
+			forEach(this.data, function(item) {
+				target.appendChild(this.createElement(item));
+			}.bind(this));
+		});
 	};
 
+	templating.single = single;
 	templating.repeat = repeat;
 
 }(window.templating = window.templating || {}));
