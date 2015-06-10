@@ -9,7 +9,9 @@ function ready(fn) {
 
 function click(selector, fn, container) {
 	var element = (container || document).querySelector(selector);
-	element.addEventListener('click', fn);
+	element.addEventListener('click', function (e) {
+		if (e.target === element) fn(e);
+	});
 }
 
 function forEach(obj, fn) {
