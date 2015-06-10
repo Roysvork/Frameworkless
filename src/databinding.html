@@ -3,10 +3,8 @@
 		<title>Lifestyles of the rich and Frameworkless - Data binding demo</title>
 	</head>
 	<body>
-		<input type="text" id="name" value="Pete" />
-		<p id="greeting"></p>
+		
 
-		<input type="button" id="itsme" value="It's me, Pete"/>
 
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/data-binding.js"></script>
@@ -20,15 +18,8 @@
 					}
 				}
 
-				dataBinding.from.value(viewModel, "name", "#name");
-				dataBinding.to.value(viewModel, "name", "#name");
-				dataBinding.to.text(viewModel, "greeting", "#greeting");
 
-				dataBinding.addDependency(viewModel, "greeting", "name");
-
-				click("#itsme", function () {
-					viewModel.name = "Pete";
-				});
+				
 			});
 		</script>
 	</body>

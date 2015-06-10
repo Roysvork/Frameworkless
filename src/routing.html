@@ -15,9 +15,8 @@
 				var items = routing.define(function (o) { o / routing.constant("items") });
 				var anItem = routing.define(function () { items / routing.alpha("id"); });
 
-				items.handler = function () { alert("items"); };
-				anItem.handler = function (parameters) {  alert(parameters.id); };
-
+				
+				
 				navigation.onHashChange(function(hash) {
 					routing.execute(hash);
 				});

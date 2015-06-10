@@ -3,49 +3,16 @@
 		<title>Lifestyles of the rich and Frameworkless - Templating Demo</title>
 	</head>
 	<body>
-		<template id="hello">
-			<p>Hello, <span id="name"></span></p>
-		</template>
-
-		<template id="list-item">
-			<li class="description"></li>
-		</template>
-
-		<div id="hello-target"></div>
-		<ul id="list"></ul>
-
-		<input type="text" id="newValue" value="Another item" />
-		<input type="button" id="addButton" value="Add another" />
+		
+		
 
 		<script type="text/javascript" src="lib/common.js"></script>
-		<script type="text/javascript" src="lib/templating.js"></script>		
+		<script type="text/javascript" src="lib/templating-2.js"></script>		
 		<script type="text/javascript" src="lib/data-binding.js"></script>
 		<script type="text/javascript">
 			ready(function() {
 
-				var helloTemplate = templating.single("#hello", function (name, p) {
-					p.querySelector("#name").textContent = name;
-				});
-
-				helloTemplate.render("Kathryn").to("#hello-target");
-				helloTemplate.render("Pete").to("#hello-target");
-
-				var viewModel = {
-					data: ["Item one", "Item two", "Item three"]
-				}
-
-				var listItem = templating.repeat("#list-item", function (item, li) {
-					li.textContent = item;
-				});
-
-				dataBinding.observe(viewModel, "data", function(value) {
-					listItem.render(value).to("#list");
-				})
-
-				click("#addButton", function() {
-					var value = document.querySelector("#newValue").value;
-					viewModel.data = viewModel.data.concat([value]);
-				})
+				
 				
 			})
 		</script>
