@@ -67,11 +67,11 @@
 
 	var toShowHide = function (value) {
 		if (value) {
-			this.classList.add("hidden");
+			this.classList.remove("hidden");
 		}
 		else
 		{
-			this.classList.remove("hidden");
+			this.classList.add("hidden");
 		}
 	};
 
@@ -83,6 +83,10 @@
 		{
 			this.style.setProperty("text-decoration", "none");
 		}
+	};
+
+	var toHref = function (value) {
+		this.href = value;
 	};
 
 	var fromValue = function(model, propertyName, selector, container) {
@@ -107,6 +111,11 @@
 		property.update();
 	};
 
+	var update = function (model, propertyName) {
+		var property = ensureWrapped(model, propertyName);
+		property.update();
+	}
+
 	var observe = function (model, propertyName, fn) {
 		var property = ensureWrapped(model, propertyName);
 		property.actions.push(function (newValue) {
@@ -121,7 +130,6 @@
 		property.actions.length = 0;
 	};
 
-	dataBinding.observe = observe;
 
 	dataBinding.to = {};
 	dataBinding.to.text = write(toText);
@@ -129,12 +137,15 @@
 	dataBinding.to.checked = write(toChecked);
 	dataBinding.to.showHide = write(toShowHide);
 	dataBinding.to.strikeThrough = write(toStrikeThrough);
+	dataBinding.to.href = write(toHref);
 
 	dataBinding.from = {};
 	dataBinding.from.value = fromValue;
 	dataBinding.from.checked = fromChecked;
 
 	dataBinding.clear = clear;
+	dataBinding.update = update;
+	dataBinding.observe = observe;
 	dataBinding.addDependency = addDependency;
 
 })(window.dataBinding = window.dataBinding || {});

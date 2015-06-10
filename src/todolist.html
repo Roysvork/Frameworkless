@@ -34,57 +34,77 @@
 		<script type="text/javascript" src="lib/repository.js"></script>
 		<script type="text/javascript">
 
-		var viewModel = dependency.inject(['repository'], function(repository) {
-			this.getItems = function () {
-				return repository.getAll()
-			};
-
-			this.addClick = function () {
+		var viewModel = {
+			items: [],
+			addClick: function () {
 				var newItem = {
-					editing: true,
+					editing: false,
 					summary: "New item",
-					done: false
+					done: false,
+					link: function() {
+						var index = viewModel.items.indexOf(this);
+						return "#/items/" + index;
+					}
 				}
 
-				repository.add(newItem);
-				this.getItems.update();
-			}.bind(this);
+				this.items.push(newItem);
+				dataBinding.update(this, "items");
+			},
+			removeClick: function (item) {
+				var index = this.items.indexOf(item);
+				if (index >= 0) {
+					this.items.splice(index, 1);
+				}
+				
+				dataBinding.update(this, "items");
+				navigation.setHash("#/items");
+			},
+			collapseAll: function () {
+				forEach(this.items, function (item) {
+					item.editing = false;
+				});
 
-			this.removeClick = function (item) {
-				repository.remove(item);
-				this.getItems.update();
+				dataBinding.update(this, "items");
 			}
-		});
+		};
+
+		navigation.onHashChange(function (hash) { routing.execute(hash); });
+		
+		var items = routing.define(function (o) { o / routing.constant("items") });
+		var anItem = routing.define(function () { items / routing.alpha("index") });
+
+		items.handler = function () { viewModel.collapseAll(); }
+		anItem.handler = function (params) { 
+			viewModel.collapseAll(); 
+			viewModel.items[params.index].editing = true;
+
+			dataBinding.update(viewModel, "items");
+		}
 
 		ready(function() {			
-			var model = new viewModel();
+			click("#addButton", function() { viewModel.addClick() });
 
-			click("#addButton", model.addClick);
-
-			var listItem = templating.repeat("#list-item", function(item, content) {
+			var listItem = templating.repeat("#list-item", function(li, item) {
 				dataBinding.clear(item, "done");
 
-				dataBinding.to.text(item, "summary", "label", content);
-				dataBinding.to.showHide(item, "editing", "fieldset", content);
+				dataBinding.to.text(item, "summary", "label > a", li);
+				dataBinding.to.href(item, "link", "label > a", li);
+				dataBinding.to.showHide(item, "editing", "fieldset", li);
 				
 				var textSelector = "fieldset > span > input[type=text]";
-				dataBinding.to.value(item, "summary", textSelector, content);
-				dataBinding.from.value(item, "summary", textSelector, content);
+				dataBinding.to.value(item, "summary", textSelector, li);
+				dataBinding.from.value(item, "summary", textSelector, li);
 				
-				dataBinding.to.checked(item, "done", "input", content);
-				dataBinding.to.strikeThrough(item, "done", "label", content);
-				dataBinding.from.checked(item, "done", "input", content);
+				dataBinding.to.checked(item, "done", "input", li);
+				dataBinding.from.checked(item, "done", "input", li);
+				dataBinding.to.strikeThrough(item, "done", "label", li);
 
 				click("fieldset > input", function () {
-					model.removeClick(item);
-				}, content);
-
-				click("label", function() {
-					item.editing = !item.editing;
-				}, content);
+					viewModel.removeClick(item);
+				}, li);
 			});
 
-			dataBinding.observe(model, "getItems", function (newValue) {
+			dataBinding.observe(viewModel, "items", function (newValue) {
 				listItem.render(newValue).to("#list");				
 			});
 		
