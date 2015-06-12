@@ -3,27 +3,38 @@
 		<title>Lifestyles of the rich and Frameworkless - Routing Demo</title>
 	</head>
 	<body>
-		<a href="#/items">Go Somewhere<a>
-		<input type="button" id="goSomewhere" value="Go!" />
+		
+		<p><a href="#/items">Go Somewhere<a></p>
+		
+		<p><input type="button" id="goSomewhere" value="Go somewhere else" /></p>		
+		
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/navigation.js"></script>
 		<script type="text/javascript" src="lib/routing-2.js"></script>
 		<script type="text/javascript">
+			var constant = routing.constant, alpha = routing.alpha, define = routing.define;
+
+			click("#goSomewhere", function() {
+				navigation.setHash("#/items/2");
+			});
+
+			navigation.onHashChange(function(hash) {
+				routing.execute(hash);
+			});
+
 			ready(function() {
 
+				var items = 	 define(function (o) { o / constant("items") });
+
 				// matches a route in the form #/items/1
-				var items = routing.define(function (o) { o / routing.constant("items") });
-				var anItem = routing.define(function () { items / routing.alpha("id"); });
+				var anItem = 	 define(function () { items / routing.alpha("id"); });
 
-				
-				
-				navigation.onHashChange(function(hash) {
-					routing.execute(hash);
-				});
+				// matches a route in the form #/items/favourites
+				var favourites = define(function () { items / constant("favourites"); });
 
-				click("#goSomewhere", function() {
-					navigation.setHash("#/items/2");
-				});
+				items.handler = function (params) { alert('Items'); };
+				anItem.handler = function (params) { alert('Item: ' + params.id); };
+				favourites.handler = function (params) { alert('Favourites'); };				
 			})
 		</script>
 	</body>
