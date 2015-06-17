@@ -43,7 +43,9 @@
 					li.textContent = data;
 				});
 
-				listItem.render(viewModel.data).to("#list");
+				dataBinding.observe(viewModel, "data", function (newValue) {
+					listItem.render(newValue).to("#list");
+				});
 
 			})
 		</script>
