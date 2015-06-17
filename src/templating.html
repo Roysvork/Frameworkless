@@ -4,7 +4,11 @@
 	</head>
 	<body>
 		
-		
+		<template id="hello">
+			<p>Hello, <span></span></p>
+		</template>
+
+		<div id="hello-target"></div>
 
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/templating-2.js"></script>		
@@ -12,8 +16,12 @@
 		<script type="text/javascript">
 			ready(function() {
 
+				var hello = templating.single("#hello", function (p, data) {
+					p.querySelector("span").textContent = data;
+				});
 				
-				
+				hello.render("Pete").to("#hello-target");
+
 			})
 		</script>
 	</body>
