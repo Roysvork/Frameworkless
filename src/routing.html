@@ -3,11 +3,12 @@
 		<title>Lifestyles of the rich and Frameworkless - Routing Demo</title>
 	</head>
 	<body>
+		<h2>Routing demo</h2>
 		
 		<p><a href="#/items">Go Somewhere<a></p>
 		
 		<p><input type="button" id="goSomewhere" value="Go somewhere else" /></p>		
-		
+
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/navigation.js"></script>
 		<script type="text/javascript" src="lib/routing-2.js"></script>
@@ -22,20 +23,25 @@
 				routing.execute(hash);
 			});
 
+			var setTitle = function (title) {
+				document.querySelector("h2").textContent = title;
+			};
+
 			ready(function() {
 
-				var items = 	 define(function (o) { o / constant("items") });
+				// #/items
+				var items = 	 	 define(function (o) { o / constant("items") });
+				// #/items/1
+				var anItem = 	 	 define(function () { items / routing.alpha("id"); });
+				// #/items/favourites
+				var favourites = 	 define(function () { items / constant("favourites"); });
 
-				// matches a route in the form #/items/1
-				var anItem = 	 define(function () { items / routing.alpha("id"); });
+				items.handler = 	 function (params) { setTitle("Items"); };
+				anItem.handler = 	 function (params) { setTitle('Item: ' + params.id); };
+				favourites.handler = function (params) { setTitle('Favourites'); };		
 
-				// matches a route in the form #/items/favourites
-				var favourites = define(function () { items / constant("favourites"); });
+			});			
 
-				items.handler = function (params) { alert('Items'); };
-				anItem.handler = function (params) { alert('Item: ' + params.id); };
-				favourites.handler = function (params) { alert('Favourites'); };				
-			})
 		</script>
 	</body>
 </html>
