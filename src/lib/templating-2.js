@@ -25,6 +25,19 @@
 		})
 	};
 
+	var repeat = function (templateSelector, init) {
+		return compose(new fluentTemplate(templateSelector, init), function (tpl) {
+			tpl.to = function (targetSelector) {
+				var target = document.querySelector(targetSelector);
+				target.innerHTML = "";
+				forEach(this.data, function (item) {
+					target.appendChild(this.createElement(item));
+				}.bind(this));
+			}
+		});
+	};
+
 	templating.single = single;
+	templating.repeat = repeat;
 
 }(window.templating = window.templating || {}));

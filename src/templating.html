@@ -8,7 +8,15 @@
 			<p>Hello, <span></span></p>
 		</template>
 
+		<template id="list-item">
+			<li></li>
+		</template>
+
 		<div id="hello-target"></div>
+
+		<input type="text" id="newValue" value="New value" />
+		<input type="button" id="addButton" value="Add another!" />
+		<ul id="list"></ul>
 
 		<script type="text/javascript" src="lib/common.js"></script>
 		<script type="text/javascript" src="lib/templating-2.js"></script>		
@@ -21,6 +29,21 @@
 				});
 				
 				hello.render("Pete").to("#hello-target");
+
+				var viewModel = {
+					data: ["Item one", "Item two", "Item three"]
+				};
+				
+				click("#addButton", function() {
+					var value = document.querySelector("#newValue").value;
+					viewModel.data = viewModel.data.concat([value]);
+				});
+
+				var listItem = templating.repeat("#list-item", function (li, data) {
+					li.textContent = data;
+				});
+
+				listItem.render(viewModel.data).to("#list");
 
 			})
 		</script>
