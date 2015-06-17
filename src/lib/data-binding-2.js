@@ -57,6 +57,17 @@
 		property.update();
 	};
 
+	var addDependency = function (model, propertyName, dependencyName) {
+		var property = ensureWrapped(model, propertyName);
+		var dependency = ensureWrapped(model, dependencyName);
+
+		dependency.actions.push(function (newValue) {
+			property.update();
+		});
+
+		property.update();
+	}
+
 	dataBinding.from = {
 		value: fromValue
 	};
@@ -64,5 +75,7 @@
 	dataBinding.to = {
 		text: toText
 	};
+	
+	dataBinding.addDependency = addDependency;
 
 }(window.dataBinding = window.dataBinding || {}));

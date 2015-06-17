@@ -20,6 +20,8 @@
 
 				dataBinding.from.value(viewModel, "name", "#name");
 				dataBinding.to.text(viewModel, "greeting", "#greeting");
+
+				dataBinding.addDependency(viewModel, "greeting", "name");
 				
 			});
 		</script>
