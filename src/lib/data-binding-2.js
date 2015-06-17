@@ -57,6 +57,17 @@
 		property.update();
 	};
 
+	var toValue = function (model, propertyName, elementSelector) {
+		var element = document.querySelector(elementSelector);
+		var property = ensureWrapped(model, propertyName);
+
+		property.actions.push(function (newValue) {
+			element.value = newValue;
+		});
+
+		property.update();
+	};
+
 	var addDependency = function (model, propertyName, dependencyName) {
 		var property = ensureWrapped(model, propertyName);
 		var dependency = ensureWrapped(model, dependencyName);
@@ -73,7 +84,8 @@
 	};
 
 	dataBinding.to = {
-		text: toText
+		text: toText,
+		value: toValue
 	};
 	
 	dataBinding.addDependency = addDependency;
